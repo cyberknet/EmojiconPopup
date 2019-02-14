@@ -39,12 +39,12 @@ namespace EmojiconPopup
             UpdateDisplayList();
         }
 
-        private void UpdateDisplayList()
+        private void UpdateDisplayList(bool limit = true)
         {
-            var emojiconList = FilteredEmojicons.Take(10);
+            var emojiconList = new List<Emojicon>(limit ? FilteredEmojicons.Take(10) : FilteredEmojicons);
             for (int i = ButtonStack.Children.Count - 1; i > 0; i--)
                 ButtonStack.Children.RemoveAt(i);
-            foreach(var emojicon in FilteredEmojicons)
+            foreach(var emojicon in emojiconList)
             {
                 var button = new Button();
                 button.Content = CreateTextBlock(emojicon.Text, 200);
@@ -52,14 +52,19 @@ namespace EmojiconPopup
                 button.PreviewMouseRightButtonUp += Button_PreviewMouseRightButtonUp;
                 ButtonStack.Children.Add(button);
             }
-            if (FilteredEmojicons.Count == 0)
+            if (emojiconList.Count == 0)
             {
                 ButtonStack.Children.Add(CreateTextBlock("(งツ)ว  Hmmmm, I didn't find that...", 200));
             }
             else if (FilteredEmojicons.Count > emojiconList.Count())
             {
-                
-                ButtonStack.Children.Add(CreateTextBlock("⋛⋋( ‘◇’)⋌⋚  There's more... search!", 200));
+                var textBlock = CreateTextBlock("⋛⋋( ‘◇’)⋌⋚  There's more... search!", 200);
+                ButtonStack.Children.Add(textBlock);
+                var button = new Button();
+                button.Content = CreateTextBlock("(∩｀-´)⊃━☆ﾟ.*･｡ﾟ Away, limit!", 200);
+                button.Click += ButtonSeeAll_Click;
+                button.PreviewMouseRightButtonUp += Button_PreviewMouseRightButtonUp;
+                ButtonStack.Children.Add(button);
             }
         }
 
@@ -92,6 +97,11 @@ namespace EmojiconPopup
                 .Replace("\n", "+{Enter}"); // replace enter with shift-enter for Skype4Business Compatibility
             System.Windows.Forms.SendKeys.SendWait(textToCopy);
             this.CloseAndDontDeactivate();
+        }
+
+        private void ButtonSeeAll_Click(object sender, RoutedEventArgs e)
+        {
+            UpdateDisplayList(limit: false);
         }
 
         private void Window_KeyUp(object sender, KeyEventArgs e)

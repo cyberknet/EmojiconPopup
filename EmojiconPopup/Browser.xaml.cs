@@ -26,6 +26,7 @@ namespace EmojiconPopup
         bool Limited = true;
         List<Emojicon> Emojicons = new List<Emojicon>();
         List<Emojicon> FilteredEmojicons = new List<Emojicon>();
+        string badJson = string.Empty;
         public Browser()
         {
             InitializeComponent();
@@ -41,10 +42,30 @@ namespace EmojiconPopup
 
         private void LoadEmojiconJson(string filename)
         {
-            string fileText = System.IO.File.ReadAllText(filename);
-            var emojicons = JsonConvert.DeserializeObject<List<Emojicon>>(fileText);
-            Emojicons.AddRange(emojicons);
-            FilteredEmojicons.AddRange(Emojicons);
+            try
+            {
+                if (!File.Exists(filename))
+                {
+                    badJson = "Json config is missing.";
+                }
+                else
+                {
+                    string fileText = System.IO.File.ReadAllText(filename);
+                    try
+                    {
+                        var emojicons = JsonConvert.DeserializeObject<List<Emojicon>>(fileText);
+                        Emojicons.AddRange(emojicons);
+                        FilteredEmojicons.AddRange(Emojicons);
+                    } catch(Exception)
+                    {
+                        badJson = "Json config is bad.";
+                    }
+                }
+            }
+            catch (Exception)// yep, swallowing Exception here. The list will indicate that no emojicon were loaded.
+            {
+                badJson = "Couldn't read json config.";
+            } 
         }
 
         private void UpdateDisplayList()
@@ -58,14 +79,23 @@ namespace EmojiconPopup
                     CreateButton(emojicon.Text, 200, Button_Click)
                     );
             }
-            if (emojiconList.Count == 0)
+            if (Emojicons.Count == 0)
             {
-                ButtonStack.Children.Add(CreateTextBlock("(งツ)ว  Hmmmm, I didn't find that...", 200));
+                ButtonStack.Children.Add(
+                    CreateTextBlock($"(－‸ლ)  Uh-oh. {badJson}.", 200)
+                    );
+            }
+            else if (emojiconList.Count == 0)
+            {
+                ButtonStack.Children.Add(
+                    CreateTextBlock("(งツ)ว  Hmmmm, I didn't find that...", 200)
+                    );
             }
             else if (FilteredEmojicons.Count > emojiconList.Count())
             {
-                var textBlock = CreateTextBlock("ʕ*̫͡*ʕ•͓͡•ʔ-̫͡-ʕ•̫͡•ʔ*̫͡*ʔ There's too many...", 200);
-                ButtonStack.Children.Add(textBlock);
+                ButtonStack.Children.Add(
+                    CreateTextBlock("ʕ*̫͡*ʕ•͓͡•ʔ-̫͡-ʕ•̫͡•ʔ*̫͡*ʔ There's too many...", 200)
+                    );
                 ButtonStack.Children.Add(
                     CreateButton("(∩｀-´)⊃━☆ﾟ.*･｡ﾟ Away, limit!", 200, ButtonSeeAll_Click)
                     );
@@ -145,8 +175,11 @@ namespace EmojiconPopup
 
         private void Search_TextChanged(object sender, TextChangedEventArgs e)
         {
-            var text = Search.Text;
-            var filteredList = Emojicons.Where(emojicon => emojicon.Keywords.Where(keyword => keyword.Contains(text, StringComparison.InvariantCultureIgnoreCase)).Count() > 0);
+            var text = Search.Text.Trim();
+            var filteredList =
+                string.IsNullOrWhiteSpace(text) ?
+                Emojicons : // if no text is typed, grab all emojicons (the query below fails if an emojicon has no keywords)
+                Emojicons.Where(emojicon => emojicon.Keywords.Where(keyword => keyword.Contains(text, StringComparison.InvariantCultureIgnoreCase)).Count() > 0);
             FilteredEmojicons.Clear();
             FilteredEmojicons.AddRange(filteredList);
             UpdateDisplayList();

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -32,12 +33,18 @@ namespace EmojiconPopup
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            string fileText = System.IO.File.ReadAllText("emojicon.json");
+            string filename = System.IO.Path.GetFullPath("emojicon.json");
+            LoadEmojiconJson(filename);
+
+            UpdateDisplayList();
+        }
+
+        private void LoadEmojiconJson(string filename)
+        {
+            string fileText = System.IO.File.ReadAllText(filename);
             var emojicons = JsonConvert.DeserializeObject<List<Emojicon>>(fileText);
             Emojicons.AddRange(emojicons);
             FilteredEmojicons.AddRange(Emojicons);
-
-            UpdateDisplayList();
         }
 
         private void UpdateDisplayList()
@@ -47,11 +54,9 @@ namespace EmojiconPopup
                 ButtonStack.Children.RemoveAt(i);
             foreach(var emojicon in emojiconList)
             {
-                var button = new Button();
-                button.Content = CreateTextBlock(emojicon.Text, 200);
-                button.Click += Button_Click;
-                button.PreviewMouseRightButtonUp += Button_PreviewMouseRightButtonUp;
-                ButtonStack.Children.Add(button);
+                ButtonStack.Children.Add(
+                    CreateButton(emojicon.Text, 200, Button_Click)
+                    );
             }
             if (emojiconList.Count == 0)
             {
@@ -61,16 +66,23 @@ namespace EmojiconPopup
             {
                 var textBlock = CreateTextBlock("ʕ*̫͡*ʕ•͓͡•ʔ-̫͡-ʕ•̫͡•ʔ*̫͡*ʔ There's too many...", 200);
                 ButtonStack.Children.Add(textBlock);
-                var button = new Button();
-                button.Content = CreateTextBlock("(∩｀-´)⊃━☆ﾟ.*･｡ﾟ Away, limit!", 200);
-                button.Click += ButtonSeeAll_Click;
-                button.PreviewMouseRightButtonUp += Button_PreviewMouseRightButtonUp;
-                ButtonStack.Children.Add(button);
+                ButtonStack.Children.Add(
+                    CreateButton("(∩｀-´)⊃━☆ﾟ.*･｡ﾟ Away, limit!", 200, ButtonSeeAll_Click)
+                    );
             }
             if (!Limited)
             {
                 ScrollView.MaxHeight = 400;
             }
+        }
+
+        private Button CreateButton(string text, double textBlockMarginThickness, RoutedEventHandler buttonClickEvent)
+        {
+            var button = new Button();
+            button.Content = CreateTextBlock(text, textBlockMarginThickness);
+            button.Click += buttonClickEvent;
+            button.PreviewMouseRightButtonUp += Button_PreviewMouseRightButtonUp;
+            return button;
         }
 
         private TextBlock CreateTextBlock(string text, double paddingThickness)

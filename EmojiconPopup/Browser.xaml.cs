@@ -22,6 +22,7 @@ namespace EmojiconPopup
     public partial class Browser : Window
     {
         bool IsClosing = false;
+        bool Limited = true;
         List<Emojicon> Emojicons = new List<Emojicon>();
         List<Emojicon> FilteredEmojicons = new List<Emojicon>();
         public Browser()
@@ -39,9 +40,9 @@ namespace EmojiconPopup
             UpdateDisplayList();
         }
 
-        private void UpdateDisplayList(bool limit = true)
+        private void UpdateDisplayList()
         {
-            var emojiconList = new List<Emojicon>(limit ? FilteredEmojicons.Take(10) : FilteredEmojicons);
+            var emojiconList = new List<Emojicon>(Limited ? FilteredEmojicons.Take(10) : FilteredEmojicons);
             for (int i = ButtonStack.Children.Count - 1; i > 0; i--)
                 ButtonStack.Children.RemoveAt(i);
             foreach(var emojicon in emojiconList)
@@ -58,13 +59,17 @@ namespace EmojiconPopup
             }
             else if (FilteredEmojicons.Count > emojiconList.Count())
             {
-                var textBlock = CreateTextBlock("⋛⋋( ‘◇’)⋌⋚  There's more... search!", 200);
+                var textBlock = CreateTextBlock("ʕ*̫͡*ʕ•͓͡•ʔ-̫͡-ʕ•̫͡•ʔ*̫͡*ʔ There's too many...", 200);
                 ButtonStack.Children.Add(textBlock);
                 var button = new Button();
                 button.Content = CreateTextBlock("(∩｀-´)⊃━☆ﾟ.*･｡ﾟ Away, limit!", 200);
                 button.Click += ButtonSeeAll_Click;
                 button.PreviewMouseRightButtonUp += Button_PreviewMouseRightButtonUp;
                 ButtonStack.Children.Add(button);
+            }
+            if (!Limited)
+            {
+                ScrollView.MaxHeight = 400;
             }
         }
 
@@ -101,7 +106,8 @@ namespace EmojiconPopup
 
         private void ButtonSeeAll_Click(object sender, RoutedEventArgs e)
         {
-            UpdateDisplayList(limit: false);
+            Limited = false;
+            UpdateDisplayList();
         }
 
         private void Window_KeyUp(object sender, KeyEventArgs e)

@@ -16,7 +16,9 @@
         WindowStyle="None"
         Deactivated="Window_Deactivated" Activated="Window_Activated"
         >
-    <StackPanel x:Name="ButtonStack" Orientation="Vertical">
-        <TextBox x:Name="Search" Padding="2" TextChanged="Search_TextChanged" MinWidth="200"></TextBox>
-    </StackPanel>
+    <ScrollViewer x:Name="ScrollView" VerticalScrollBarVisibility="Auto"  HorizontalScrollBarVisibility="Disabled">
+        <StackPanel x:Name="ButtonStack" Orientation="Vertical">
+            <TextBox x:Name="Search" Padding="2" TextChanged="Search_TextChanged" MinWidth="200"></TextBox>
+        </StackPanel>
+    </ScrollViewer>
 </Window>

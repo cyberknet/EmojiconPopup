@@ -120,6 +120,7 @@ namespace EmojiconPopup
         {
             Limited = false;
             UpdateDisplayList();
+            Search.Focus();
         }
 
         private void Window_KeyUp(object sender, KeyEventArgs e)
@@ -138,7 +139,6 @@ namespace EmojiconPopup
 
         private void Window_Deactivated(object sender, EventArgs e)
         {
-            Debug.WriteLine("Deactivated!");
             if (!IsClosing)
                 Close();
         }

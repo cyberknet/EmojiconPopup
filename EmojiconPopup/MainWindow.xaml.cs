@@ -16,7 +16,7 @@ using System.Windows.Shapes;
 using NHotkey;
 using NHotkey.Wpf;
 
-namespace AsciiBrowser
+namespace EmojiconPopup
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

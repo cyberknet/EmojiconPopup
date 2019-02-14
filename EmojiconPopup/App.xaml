@@ -1,7 +1,7 @@
-﻿<Application x:Class="AsciiBrowser.App"
+﻿<Application x:Class="EmojiconPopup.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:AsciiBrowser"
+             xmlns:local="clr-namespace:EmojiconPopup"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
          

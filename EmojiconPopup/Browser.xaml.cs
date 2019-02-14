@@ -14,7 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace AsciiBrowser
+namespace EmojiconPopup
 {
     /// <summary>
     /// Interaction logic for Browser.xaml
@@ -41,28 +41,35 @@ namespace AsciiBrowser
 
         private void UpdateDisplayList()
         {
+            var emojiconList = FilteredEmojicons.Take(10);
             for (int i = ButtonStack.Children.Count - 1; i > 0; i--)
                 ButtonStack.Children.RemoveAt(i);
             foreach(var emojicon in FilteredEmojicons)
             {
                 var button = new Button();
-                var textBlock = new TextBlock();
-                textBlock.Text = emojicon.Text;
-                button.Content = textBlock;
+                button.Content = CreateTextBlock(emojicon.Text, 200);
                 button.Click += Button_Click;
                 button.PreviewMouseRightButtonUp += Button_PreviewMouseRightButtonUp;
-                button.Padding = new Thickness(3);
-                button.MinWidth = 200;
                 ButtonStack.Children.Add(button);
             }
             if (FilteredEmojicons.Count == 0)
             {
-                var textBlock = new TextBlock();
-                textBlock.Text = "(´；ω；`);   waaaa - I couldn't find it!";
-                textBlock.MinWidth = 200;
-                textBlock.Padding = new Thickness(3);
-                ButtonStack.Children.Add(textBlock);
+                ButtonStack.Children.Add(CreateTextBlock("(´；ω；`);   waaaa - I couldn't find it!", 200));
             }
+            else if (FilteredEmojicons.Count > emojiconList.Count())
+            {
+                
+                ButtonStack.Children.Add(CreateTextBlock("⋛⋋( ‘◇’)⋌⋚  There's more... search!", 200));
+            }
+        }
+
+        private TextBlock CreateTextBlock(string text, double paddingThickness)
+        {
+            var textBlock = new TextBlock();
+            textBlock.Text = text;
+            textBlock.MinWidth = paddingThickness;
+            textBlock.Padding = new Thickness(3);
+            return textBlock;
         }
 
         private void Button_PreviewMouseRightButtonUp(object sender, MouseButtonEventArgs e)
@@ -82,7 +89,7 @@ namespace AsciiBrowser
                 .Replace("~", "{~}")
                 .Replace("(", "{(}")
                 .Replace(")", "{)}")
-                .Replace("\n", "+{Enter}");
+                .Replace("\n", "+{Enter}"); // replace enter with shift-enter for Skype4Business Compatibility
             System.Windows.Forms.SendKeys.SendWait(textToCopy);
             this.CloseAndDontDeactivate();
         }
@@ -120,14 +127,6 @@ namespace AsciiBrowser
         private void Window_Activated(object sender, EventArgs e)
         {
             Search.Focus();
-        }
-    }
-
-    public static class StringExtensions
-    {
-        public static bool Contains(this string source, string toCheck, StringComparison comp)
-        {
-            return source?.IndexOf(toCheck, comp) >= 0;
         }
     }
 }

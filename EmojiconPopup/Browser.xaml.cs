@@ -54,7 +54,7 @@ namespace EmojiconPopup
             }
             if (FilteredEmojicons.Count == 0)
             {
-                ButtonStack.Children.Add(CreateTextBlock("(´；ω；`);   waaaa - I couldn't find it!", 200));
+                ButtonStack.Children.Add(CreateTextBlock("(งツ)ว  Hmmmm, I didn't find that...", 200));
             }
             else if (FilteredEmojicons.Count > emojiconList.Count())
             {
